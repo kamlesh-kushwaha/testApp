@@ -1,14 +1,16 @@
 # config valid only for current version of Capistrano
 lock '3.4.1'
 
-set :application, 'my_app_name'
-set :repo_url, 'git@example.com:me/my_repo.git'
+set :application, 'testApp'
+set :repo_url, 'git@github.com:kamlesh-kushwaha/testApp.git'
 
 # Default branch is :master
 # ask :branch, `git rev-parse --abbrev-ref HEAD`.chomp
 
 # Default deploy_to directory is /var/www/my_app_name
-# set :deploy_to, '/var/www/my_app_name'
+set :deploy_to, '/opt/www/testApp'
+set :user, 'deploy'
+set :linked_dirs, %w{log tmp/pids/ tmp/cache tmp/sockets}
 
 # Default value for :scm is :git
 # set :scm, :git
@@ -35,14 +37,31 @@ set :repo_url, 'git@example.com:me/my_repo.git'
 # set :keep_releases, 5
 
 namespace :deploy do
+	%w[start stop restart].each do |command|
+		desc 'manage unicon'
+		task command do
+			on roles(:app), in: :sequence, wait: 1 do
+				execute "/etc/init.d/unicorn_#{fetch(:application)} #{command}"
+			end
+		end
+	end
 
-  after :restart, :clear_cache do
-    on roles(:web), in: :groups, limit: 3, wait: 10 do
-      # Here we can do anything such as:
-      # within release_path do
-      #   execute :rake, 'cache:clear'
-      # end
-    end
-  end
+
+	after :publishing, :restart
+
+	after :restart ,:clear_cache do
+		on roles(:web) ,in: :groups, limit: 3, wait: 10 do
+		end
+	end
+
+
+  # after :restart, :clear_cache do
+  #   on roles(:web), in: :groups, limit: 3, wait: 10 do
+  #     # Here we can do anything such as:
+  #     # within release_path do
+  #     #   execute :rake, 'cache:clear'
+  #     # end
+  #   end
+  # end
 
 end
