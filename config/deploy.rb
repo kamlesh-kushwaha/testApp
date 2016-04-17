@@ -9,7 +9,7 @@ set :repo_url, 'git@github.com:kamlesh-kushwaha/testApp.git'
 
 # Default deploy_to directory is /var/www/my_app_name
 set :deploy_to, '/opt/www/testApp'
-set :user, 'deploy'
+set :user, 'root'
 set :linked_dirs, %w{log tmp/pids/ tmp/cache tmp/sockets}
 
 # Default value for :scm is :git
@@ -36,7 +36,7 @@ set :linked_dirs, %w{log tmp/pids/ tmp/cache tmp/sockets}
 # Default value for keep_releases is 5
 # set :keep_releases, 5
 
-namespace :deploy do
+namespace :root do
 	%w[start stop restart].each do |command|
 		desc 'manage unicon'
 		task command do
@@ -47,7 +47,7 @@ namespace :deploy do
 	end
 
 
-	after :publishing, :restart
+	# after  :restart
 
 	after :restart ,:clear_cache do
 		on roles(:web) ,in: :groups, limit: 3, wait: 10 do
